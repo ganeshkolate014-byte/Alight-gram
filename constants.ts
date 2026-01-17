@@ -27,3 +27,10 @@ export const GENRES = [
   "Presets", 
   "Other"
 ];
+
+export const ASPECT_RATIOS = [
+  { label: '9:16', value: '9:16' },
+  { label: '16:9', value: '16:9' },
+  { label: '1:1', value: '1:1' },
+  { label: '4:5', value: '4:5' },
+];

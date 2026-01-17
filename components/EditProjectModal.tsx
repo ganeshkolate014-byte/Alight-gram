@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Project } from '../types';
-import { Video, FileCode, Check, AlertCircle, ChevronRight, X, Save } from 'lucide-react';
+import { Video, FileCode, Check, AlertCircle, ChevronRight, X, Save, Smartphone, Monitor, Square, RectangleVertical } from 'lucide-react';
 import { uploadToCloudinary } from '../services/cloudinary';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { GENRES } from '../constants';
+import { GENRES, ASPECT_RATIOS } from '../constants';
 
 interface EditProjectModalProps {
   project: Project;
@@ -16,6 +16,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, onClose, o
   const [title, setTitle] = useState(project.title);
   const [description, setDescription] = useState(project.description);
   const [genre, setGenre] = useState(project.genre || GENRES[0]);
+  const [aspectRatio, setAspectRatio] = useState(project.aspectRatio || '4:5');
   const [visibility, setVisibility] = useState<'public' | 'private'>(project.visibility);
   const [xmlFile, setXmlFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -43,6 +44,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, onClose, o
         title,
         description,
         genre,
+        aspectRatio,
         visibility
       };
 
@@ -63,6 +65,16 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, onClose, o
       setError(err.message || 'Failed to update project');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getAspectRatioIcon = (ratio: string) => {
+    switch (ratio) {
+      case '9:16': return <Smartphone size={24} strokeWidth={1.5} />;
+      case '16:9': return <Monitor size={24} strokeWidth={1.5} />;
+      case '1:1': return <Square size={24} strokeWidth={1.5} />;
+      case '4:5': return <RectangleVertical size={24} strokeWidth={1.5} />;
+      default: return <RectangleVertical size={24} strokeWidth={1.5} />;
     }
   };
 
@@ -134,6 +146,24 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, onClose, o
                       className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${genre === g ? 'bg-white text-black' : 'bg-white/5 text-slate-400 hover:bg-white/10'}`}
                     >
                       {g}
+                    </button>
+                  ))}
+               </div>
+            </div>
+
+            {/* Aspect Ratio Selection */}
+            <div>
+               <h3 className="text-xs font-medium text-ios-labelSecondary uppercase ml-4 mb-2">Aspect Ratio</h3>
+               <div className="bg-ios-cardHigh rounded-xl p-2 grid grid-cols-4 gap-2">
+                  {ASPECT_RATIOS.map((ratio) => (
+                    <button
+                      key={ratio.value}
+                      type="button"
+                      onClick={() => setAspectRatio(ratio.value)}
+                      className={`flex flex-col items-center justify-center py-3 rounded-lg transition-all ${aspectRatio === ratio.value ? 'bg-white text-black shadow-lg' : 'bg-transparent text-ios-labelSecondary hover:bg-white/5'}`}
+                    >
+                      <span className="mb-2">{getAspectRatioIcon(ratio.value)}</span>
+                      <span className="text-[10px] font-bold">{ratio.label}</span>
                     </button>
                   ))}
                </div>

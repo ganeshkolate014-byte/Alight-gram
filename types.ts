@@ -10,6 +10,7 @@ export interface Project {
   title: string;
   description: string;
   genre: string; // New field
+  aspectRatio?: '9:16' | '16:9' | '1:1' | '4:5'; // New field for video dimensions
   xmlContent: string;
   videoUrl: string; // Cloudinary URL
   visibility: 'public' | 'private';

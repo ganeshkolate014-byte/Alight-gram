@@ -68,6 +68,17 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, currentUser }) => {
   const canDownload = project.visibility === 'public' || project.ownerId === currentUser.uid;
   const isOwner = project.ownerId === currentUser.uid;
 
+  // Determine Aspect Ratio Class
+  const getAspectRatioClass = (ratio?: string) => {
+    switch (ratio) {
+      case '16:9': return 'aspect-video';
+      case '1:1': return 'aspect-square';
+      case '9:16': return 'aspect-[9/16]';
+      case '4:5': return 'aspect-[4/5]';
+      default: return 'aspect-[4/5] sm:aspect-video'; // Fallback
+    }
+  };
+
   return (
     <>
     <div className="bg-ios-card rounded-ios overflow-hidden mb-8 border border-white/[0.05] shadow-2xl flex flex-col transform transition-all duration-300">
@@ -134,8 +145,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, currentUser }) => {
         )}
       </div>
 
-      {/* Media Content */}
-      <div className="w-full aspect-[4/5] sm:aspect-video bg-black relative">
+      {/* Media Content - Dynamic Aspect Ratio */}
+      <div className={`w-full ${getAspectRatioClass(project.aspectRatio)} bg-black relative transition-all duration-300`}>
         {project.videoUrl ? (
           <VideoPlayer src={project.videoUrl} />
         ) : (
