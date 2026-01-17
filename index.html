@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="A secure project-sharing platform for Alight Motion XML projects.">
+    
+    <title>AlightGram</title>
+    
+    <!-- PWA & Logo -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="https://freelogopng.com/images/all_img/1680367733alight-motion-logo-black.png">
+    <link rel="apple-touch-icon" href="https://freelogopng.com/images/all_img/1680367733alight-motion-logo-black.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'sans-serif'],
+            },
+            colors: {
+              ios: {
+                bg: '#000000',
+                card: '#1C1C1E',
+                cardHigh: '#2C2C2E',
+                separator: '#38383A',
+                blue: '#0A84FF',
+                green: '#30D158',
+                red: '#FF453A',
+                gray: '#8E8E93',
+                label: '#F2F2F7',
+                labelSecondary: '#8E8E93',
+              },
+              brand: {
+                50: '#f0fdf4',
+                100: '#dcfce7',
+                200: '#bbf7d0',
+                300: '#86efac',
+                400: '#4ade80',
+                500: '#22c55e',
+                600: '#16a34a',
+                700: '#15803d',
+                800: '#166534',
+                900: '#14532d',
+                950: '#052e16',
+              }
+            },
+            borderRadius: {
+              'ios': '32px',
+              'ios-sm': '20px',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "firebase/": "https://esm.sh/firebase@^12.8.0/"
+  }
+}
+</script>
+<style>
+  /* Custom Range Slider for Video Player */
+  .video-slider {
+    -webkit-appearance: none;
+    background: transparent;
+    height: 4px;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .video-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    margin-top: -4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .video-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+  }
+  
+  /* Hide scrollbar for clean UI */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Smooth View Transitions */
+  .view-transition {
+    animation: fadeInScale 0.4s cubic-bezier(0.2, 0.0, 0.2, 1);
+  }
+
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.98) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+</style>
+</head>
+  <body class="bg-black text-ios-label antialiased font-sans selection:bg-ios-blue selection:text-white pb-safe">
+    <div id="root"></div>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered');
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

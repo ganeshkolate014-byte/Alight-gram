@@ -1,0 +1,21 @@
+{
+  "short_name": "AlightGram",
+  "name": "AlightGram Project Sharer",
+  "icons": [
+    {
+      "src": "https://freelogopng.com/images/all_img/1680367733alight-motion-logo-black.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://freelogopng.com/images/all_img/1680367733alight-motion-logo-black.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
+}
