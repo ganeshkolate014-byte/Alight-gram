@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Project } from '../types';
-import { Video, FileCode, Check, AlertCircle, ChevronRight, X, Save, Smartphone, Monitor, Square, RectangleVertical } from 'lucide-react';
+import { Video, File, Check, AlertCircle, ChevronRight, X, Save, Smartphone, Monitor, Square, RectangleVertical } from 'lucide-react';
 import { uploadToCloudinary } from '../services/cloudinary';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -18,7 +18,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, onClose, o
   const [genre, setGenre] = useState(project.genre || GENRES[0]);
   const [aspectRatio, setAspectRatio] = useState(project.aspectRatio || '4:5');
   const [visibility, setVisibility] = useState<'public' | 'private'>(project.visibility);
-  const [xmlFile, setXmlFile] = useState<File | null>(null);
+  const [projectFile, setProjectFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,8 +48,11 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, onClose, o
         visibility
       };
 
-      if (xmlFile) {
-        updates.xmlContent = await xmlFile.text();
+      if (projectFile) {
+        // Upload new file to Cloudinary
+        const fileUrl = await uploadToCloudinary(projectFile);
+        updates.fileUrl = fileUrl;
+        updates.fileName = projectFile.name;
       }
 
       if (videoFile) {
@@ -176,17 +179,17 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, onClose, o
                     <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 transition-colors">
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 rounded bg-orange-500/20 flex items-center justify-center">
-                                <FileCode size={18} className="text-orange-500" />
+                                <File size={18} className="text-orange-500" />
                             </div>
-                            <span className="text-white">XML Project</span>
+                            <span className="text-white">Project File</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <span className={`text-sm ${xmlFile ? 'text-ios-green' : 'text-ios-labelSecondary'}`}>
-                                {xmlFile ? xmlFile.name.substring(0, 15) + '...' : 'Keep Current'}
+                            <span className={`text-sm ${projectFile ? 'text-ios-green' : 'text-ios-labelSecondary'}`}>
+                                {projectFile ? projectFile.name.substring(0, 15) + '...' : 'Keep Current'}
                             </span>
-                            {xmlFile ? <Check size={16} className="text-ios-green" /> : <ChevronRight size={16} className="text-ios-labelSecondary" />}
+                            {projectFile ? <Check size={16} className="text-ios-green" /> : <ChevronRight size={16} className="text-ios-labelSecondary" />}
                         </div>
-                        <input type="file" accept=".xml" className="hidden" onChange={(e) => setXmlFile(e.target.files?.[0] || null)} />
+                        <input type="file" className="hidden" onChange={(e) => setProjectFile(e.target.files?.[0] || null)} />
                     </label>
 
                     <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 transition-colors">

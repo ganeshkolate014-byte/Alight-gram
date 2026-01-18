@@ -9,9 +9,11 @@ export interface Project {
   id: string; // Document ID
   title: string;
   description: string;
-  genre: string; // New field
-  aspectRatio?: '9:16' | '16:9' | '1:1' | '4:5'; // New field for video dimensions
-  xmlContent: string;
+  genre: string;
+  aspectRatio?: '9:16' | '16:9' | '1:1' | '4:5';
+  xmlContent?: string; // Legacy field for text-based XML
+  fileUrl?: string; // New field for any file type (Cloudinary URL)
+  fileName?: string; // New field to store original filename
   videoUrl: string; // Cloudinary URL
   visibility: 'public' | 'private';
   ownerId: string;

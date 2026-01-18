@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
-import { Video, FileCode, Check, AlertCircle, ChevronRight, Smartphone, Monitor, Square, RectangleVertical } from 'lucide-react';
+import { Video, File, Check, AlertCircle, ChevronRight, Smartphone, Monitor, Square, RectangleVertical } from 'lucide-react';
 import { uploadToCloudinary } from '../services/cloudinary';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -18,7 +18,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ currentUser, onClose, onUploa
   const [genre, setGenre] = useState(GENRES[0]);
   const [aspectRatio, setAspectRatio] = useState<string>('4:5'); // Default to Standard
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
-  const [xmlFile, setXmlFile] = useState<File | null>(null);
+  const [projectFile, setProjectFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -42,8 +42,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ currentUser, onClose, onUploa
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!xmlFile) {
-      setError('XML Project file is required');
+    if (!projectFile) {
+      setError('Project file is required');
       return;
     }
 
@@ -51,7 +51,10 @@ const UploadModal: React.FC<UploadModalProps> = ({ currentUser, onClose, onUploa
     setError('');
 
     try {
-      const xmlContent = await xmlFile.text();
+      // 1. Upload Main Project File
+      const fileUrl = await uploadToCloudinary(projectFile);
+
+      // 2. Upload Video Preview (Optional)
       let videoUrl = '';
       if (videoFile) {
         videoUrl = await uploadToCloudinary(videoFile);
@@ -62,7 +65,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ currentUser, onClose, onUploa
         description,
         genre,
         aspectRatio,
-        xmlContent,
+        fileUrl, // Store the URL
+        fileName: projectFile.name, // Store original name
         videoUrl,
         visibility,
         ownerId: currentUser.uid,
@@ -119,8 +123,8 @@ const UploadModal: React.FC<UploadModalProps> = ({ currentUser, onClose, onUploa
           <h2 className="text-[17px] font-semibold text-white">New Project</h2>
           <button 
             onClick={handleUpload}
-            disabled={loading || !title || !xmlFile}
-            className={`text-[17px] font-semibold transition-opacity ${loading || !title || !xmlFile ? 'text-ios-labelSecondary opacity-50' : 'text-ios-blue hover:opacity-70'}`}
+            disabled={loading || !title || !projectFile}
+            className={`text-[17px] font-semibold transition-opacity ${loading || !title || !projectFile ? 'text-ios-labelSecondary opacity-50' : 'text-ios-blue hover:opacity-70'}`}
           >
             {loading ? 'Post...' : 'Post'}
           </button>
@@ -199,17 +203,18 @@ const UploadModal: React.FC<UploadModalProps> = ({ currentUser, onClose, onUploa
                     <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 transition-colors">
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 rounded bg-orange-500/20 flex items-center justify-center">
-                                <FileCode size={18} className="text-orange-500" />
+                                <File size={18} className="text-orange-500" />
                             </div>
-                            <span className="text-white">XML Project</span>
+                            <span className="text-white">Project File</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <span className={`text-sm ${xmlFile ? 'text-ios-green' : 'text-ios-labelSecondary'}`}>
-                                {xmlFile ? xmlFile.name.substring(0, 15) + '...' : 'Required'}
+                            <span className={`text-sm ${projectFile ? 'text-ios-green' : 'text-ios-labelSecondary'}`}>
+                                {projectFile ? projectFile.name.substring(0, 15) + '...' : 'Required'}
                             </span>
-                            {xmlFile ? <Check size={16} className="text-ios-green" /> : <ChevronRight size={16} className="text-ios-labelSecondary" />}
+                            {projectFile ? <Check size={16} className="text-ios-green" /> : <ChevronRight size={16} className="text-ios-labelSecondary" />}
                         </div>
-                        <input type="file" accept=".xml" className="hidden" onChange={(e) => setXmlFile(e.target.files?.[0] || null)} />
+                        {/* Removed accept attribute to allow any file */}
+                        <input type="file" className="hidden" onChange={(e) => setProjectFile(e.target.files?.[0] || null)} />
                     </label>
 
                     <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 transition-colors">

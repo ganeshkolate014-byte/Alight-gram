@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project, UserProfile } from '../types';
-import { Download, Heart, MessageCircle, Lock, Globe, User, Share2, MoreHorizontal, Trash2, Edit3 } from 'lucide-react';
+import { Download, Heart, MessageCircle, Lock, Globe, User, Share2, MoreHorizontal, Trash2, Edit3, File } from 'lucide-react';
 import { doc, updateDoc, arrayUnion, arrayRemove, increment, deleteDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import Comments from './Comments';
@@ -19,16 +19,37 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, currentUser }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const handleDownload = () => {
-    const blob = new Blob([project.xmlContent], { type: 'text/xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${project.title.replace(/\s+/g, '_')}.xml`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownload = async () => {
+    if (project.fileUrl) {
+      // New Logic: Download from URL
+      try {
+        const response = await fetch(project.fileUrl);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        // Use stored filename or fallback
+        a.download = project.fileName || `${project.title.replace(/\s+/g, '_')}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error("Download failed, opening in new tab", e);
+        window.open(project.fileUrl, '_blank');
+      }
+    } else if (project.xmlContent) {
+      // Legacy Logic: XML Content
+      const blob = new Blob([project.xmlContent], { type: 'text/xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${project.title.replace(/\s+/g, '_')}.xml`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   };
 
   const toggleLike = async () => {
@@ -152,9 +173,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, currentUser }) => {
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-ios-cardHigh border-y border-white/5">
             <div className="p-6 rounded-full bg-white/5 mb-4">
-                <Globe size={40} className="text-ios-blue opacity-50" />
+                <File size={40} className="text-ios-blue opacity-50" />
             </div>
-            <span className="text-lg font-medium text-ios-labelSecondary">XML File Only</span>
+            <span className="text-lg font-medium text-ios-labelSecondary">File Only</span>
           </div>
         )}
       </div>
@@ -187,7 +208,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, currentUser }) => {
             className="flex items-center space-x-2 bg-ios-cardHigh hover:bg-white/20 text-white pl-4 pr-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 active:scale-95 border border-white/10"
           >
             <Download size={16} />
-            <span>Download XML</span>
+            <span>Download</span>
           </button>
         )}
       </div>
